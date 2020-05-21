@@ -1,0 +1,1 @@
+python train.py --train --is_processed --model_name '42B_300D'
