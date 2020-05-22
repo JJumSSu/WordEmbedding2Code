@@ -64,15 +64,15 @@ class Decoder(nn.Module):
 
 
 class Classifier(nn.Module):
-    def __init__(self, args, glove_embedding, hidden_size=150):
+    def __init__(self, args, glove_embedding):
         super(Classifier, self).__init__()
         self.vocab_size, self.emb_size = glove_embedding.size()
         self.embedding = nn.Embedding(self.vocab_size, self.emb_size)
         self.embedding.weight.data.copy_(glove_embedding)
         self.embedding.weight.requires_grad=False
         
-        self.hidden_size = hidden_size
-        self.lstm = nn.LSTM(input_size = self.emb_size, hidden_size = hidden_size, batch_first=True)
+        self.hidden_size = args.hidden_size
+        self.lstm = nn.LSTM(input_size = self.emb_size, hidden_size = hidden_size)
         self.fc   = nn.Linear(hidden_size, 2)
         
     def forward(self, x):        
