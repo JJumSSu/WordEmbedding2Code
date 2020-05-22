@@ -12,11 +12,11 @@ class CODE_AE(nn.Module):
         self.encoder = Encoder(args)        
         self.decoder = Decoder(args)
 
-    def forward(self, x, is_training=True):
-        y_w      = self.encoder(x, is_training)
+    def forward(self, x):
+        y_w      = self.encoder(x)
         rec_emb  = self.decoder(y_w)
 
-        return rec_emb
+        return y_w, rec_emb
 
 
 class Encoder(nn.Module):
@@ -29,17 +29,12 @@ class Encoder(nn.Module):
         self.theta   = nn.Linear(self.hidden_dim, (self.cluster_num * self.code_book_len) // 2, bias=True)
         self.theta_p = nn.Linear((self.cluster_num * self.code_book_len) // 2, self.cluster_num * self.code_book_len, bias=True)
 
-    def forward(self, x, is_training=True):
+    def forward(self, x):
         h_w = torch.tanh(self.theta(x)) # B x mk/2
         a_w = F.softplus(self.theta_p(h_w)) # B x m*k
         a_w = a_w.reshape(-1, self.code_book_len, self.cluster_num) # B x m x k
         y_w = self._gumbel_softmax(a_w) # B x m x k
         
-        if not is_training:
-            _, ind = y_w.max(dim=-1)
-            y_w    = torch.zeros_like(y_w).scatter_(-1, ind.unsqueeze(2), 1.0)
-            return y_w, ind.squeeze()
-
         return y_w
                       
     def _gumbel_softmax(self, x, eps=1e-10):  # B x m x k -> B x m x k (one-hot), tau=1
@@ -64,8 +59,7 @@ class Decoder(nn.Module):
 
     def forward(self, y_w):
         y_w   = y_w.reshape(-1, self.code_book_len * self.cluster_num) # B x MK
-        E_hat = torch.matmul(y_w, self.A) # B x MK, MK x h -> B x H
-            
+        E_hat = torch.matmul(y_w, self.A) # B x MK, MK x h -> B x H     
         return E_hat
 
 
