@@ -49,7 +49,7 @@ make train MODEL_NAME=Your_Compressor_Model_Name M=32 K=16
   Normally it should work like as in the figure below.
 
 <p align="center">
-  <img width="460" height="300" src=screenshot.PNG>
+  <img  src=screenshot.PNG>
 </p>
   
 
