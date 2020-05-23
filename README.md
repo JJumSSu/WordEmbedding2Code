@@ -89,8 +89,8 @@ Results evaluated on the hedlout validation dataset(42B.300d)
 
 |Method|Eculidian|Euclidian^2|
 |------|---|---|
-|With Codes|4.276|18.280
-|With Logits|3.492|12.192
+|With Codes|4.276|18.280|
+|With Logits|3.492|12.192|
 
 ### Sentiment Classification Accuracy
 
