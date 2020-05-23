@@ -6,7 +6,7 @@ Pytorch implementation of the paper
 ## Dependencies
 
 * python 3.6
-* pytorch 1.5
+* pytorch 1.5.0
 * numpy
 * keras (for downloading IMDB Dataset)
 
