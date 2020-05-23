@@ -24,7 +24,9 @@ Move to Directory containing source files.
 
 ### Get GloVe
 
-```bash get_glove.sh```
+```
+bash get_glove.sh
+```
 
 ### Train Code Learner
 
