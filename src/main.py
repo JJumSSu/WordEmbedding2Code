@@ -29,7 +29,7 @@ def load_GloVe(args):
             splitLines = line.split()
             word  = splitLines[0]
             embed = np.array([float(value) for value in splitLines[1:]])
-
+        
             try: # 6B version has some weird lines
                 word  = word.decode("utf-8")
             except UnicodeDecodeError:
@@ -151,26 +151,35 @@ def evaluate(args, valid_loader, eval_loader, idx2word):
     best_checkpoint = torch.load(args.path_output + args.model_name + '_best_ckpt.pt')
     model.load_state_dict(best_checkpoint)
     model.eval()
-    test_loss = []
+    test_loss      = []
+    test_loss_code = []
 
     # valid_loader is used for evluation(hedlout-subset)
     for batch_idx, (data, target) in enumerate(valid_loader):
         data, target    = Variable(data), Variable(target)
         data, target    = to_cuda(data), to_cuda(target)
         logits, rec_emb = model(data)
+        _, codes        = logits.max(dim=-1)
+        one_hot         = torch.zeros_like(logits).scatter_(-1, codes.unsqueeze(2), 1.0) # k-dimensional vector
+        rec_emb_code    = model.decoder(one_hot)
+
         test_loss.extend(np.linalg.norm((rec_emb - target).data.cpu(), axis=1).tolist())
+        test_loss_code.extend(np.linalg.norm((rec_emb_code - target).data.cpu(), axis=1).tolist())
                     
-    test_loss = np.mean(test_loss)
-    print("Evluation Loss (L2 Norm) : {:.3f} (L2 Norm^2) : {:.3f}".format(test_loss, test_loss**2))        
+    test_loss      = np.mean(test_loss)
+    test_loss_code = np.mean(test_loss_code)
+
+    print("Evluation Loss from logits (L2 Norm) : {:.3f} (L2 Norm^2) : {:.3f}".format(test_loss, test_loss**2))        
+    print("Evluation Loss from codes  (L2 Norm) : {:.3f} (L2 Norm^2) : {:.3f}".format(test_loss_code, test_loss_code**2))        
     
-    # eval_loader is used for generating word2code(all_dataset)
+    # eval_loader is used for generating word2code and reconstructed embedding(used for evaluating sentiment)
     for batch_idx, (data, target) in enumerate(eval_loader):
         data, target  = Variable(data), Variable(target)
         data, target  = to_cuda(data), to_cuda(target)
         logits, _     = model(data)
         _, codes = logits.max(dim=-1)
         one_hot  = torch.zeros_like(logits).scatter_(-1, codes.unsqueeze(2), 1.0) # k-dimensional vector
-
+        
         if batch_idx > 0:
             glove2codes = torch.cat([glove2codes, codes],  dim=0)
             glove2bool  = torch.cat([glove2bool, one_hot],  dim=0)
@@ -178,7 +187,8 @@ def evaluate(args, valid_loader, eval_loader, idx2word):
         else:
             glove2codes = codes
             glove2bool  = one_hot
-            
+    
+    
     glove2codes  = glove2codes.cpu().numpy()
     glove2onehot = glove2bool.cpu().numpy()
 
@@ -189,6 +199,9 @@ def evaluate(args, valid_loader, eval_loader, idx2word):
     with open(args.path_output + args.model_name + "_glove2onehot.pkl", 'wb') as f:
         pickle.dump(glove2onehot, f)
         f.close()
+
+    codebook = model.decoder.A.detach().cpu().clone()
+    torch.save(codebook, args.path_output + args.model_name + "_codebook.pt")
 
 
 def main():
@@ -201,12 +214,12 @@ def main():
     parser.add_argument('--batch_size',      type=int,   default=128*4,    help='batch size')
     parser.add_argument('--max_epoch',       type=int,   default=200,      help='number of epochs to train')
     parser.add_argument('--lr',              type=float, default=0.0001,   help='learning rate')
-    parser.add_argument('--seed',            type=int,   default=42,       help='random seed')
+    parser.add_argument('--seed',            type=int,   default=1,        help='random seed')
     parser.add_argument('--hidden_dim',      type=int,   default=300,      help='number of dimensions of input size')
     parser.add_argument('--code_book_len',   type=int,   default=32,       help='number of codebooks')
     parser.add_argument('--cluster_num',     type=int,   default=16,       help='length of a codebook')
 
-    parser.add_argument('--glove_file',      type=str,   default='',                    help='input data path')
+    parser.add_argument('--glove_file',      type=str,   default='glove.42B.300d.txt',  help='input data path')
     parser.add_argument('--path_glove',      type=str,   default='../data/',            help='input data path')
     parser.add_argument('--path_output',     type=str,   default='../output/',          help='path output codes')
     parser.add_argument('--model_name',      type=str,   default='glove.6B.300d.txt',   help='glove_file')

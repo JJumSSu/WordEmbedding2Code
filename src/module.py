@@ -67,18 +67,22 @@ class Classifier(nn.Module):
     def __init__(self, args, glove_embedding):
         super(Classifier, self).__init__()
         self.vocab_size, self.emb_size = glove_embedding.size()
-        self.embedding = nn.Embedding(self.vocab_size, self.emb_size)
-        self.embedding.weight.data.copy_(glove_embedding)
+        self.embedding  = nn.Embedding(self.vocab_size, self.emb_size).from_pretrained(glove_embedding)
         self.embedding.weight.requires_grad=False
-        
-        self.hidden_size = args.hidden_size
-        self.lstm = nn.LSTM(input_size = self.emb_size, hidden_size = hidden_size)
-        self.fc   = nn.Linear(hidden_size, 2)
+    
+        self.lstm = nn.LSTM(input_size = self.emb_size, hidden_size = args.hidden_size, batch_first=True)
+        self.fc   = nn.Linear(args.hidden_size, 2)
+
+        self.c0 = torch.zeros(1, 1, args.hidden_size, requires_grad=True)
+        self.h0 = torch.zeros(1, 1, args.hidden_size, requires_grad=True)
+
         
     def forward(self, x):        
+        h = torch.cat([self.h0 for _ in range(x.size(0))], 1).cuda()
+        c = torch.cat([self.c0 for _ in range(x.size(0))], 1).cuda()
         x       = self.embedding(x)
-        out, _  = self.lstm(x)
-        out     = self.fc(out[-1])
+        out, _  = self.lstm(x, (c,h)) # B H, (c,h)
+        out     = self.fc(out[:, -1, :])
         logits  = F.log_softmax(out, dim=1)
 
-        return logits
+        return logits    
