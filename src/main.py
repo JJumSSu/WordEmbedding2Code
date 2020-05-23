@@ -76,6 +76,7 @@ def set_seed(args):
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
     torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 def load(args):
@@ -119,7 +120,7 @@ def train(args, train_loader, valid_loader):
             train_steps += 1
 
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.0001) # manage unstable training
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.001) # manage unstable training
             optimizer.step()
             
             print('| training progress [{}/{}]'.format(train_steps, max_train_steps), end='\r', flush=True)
