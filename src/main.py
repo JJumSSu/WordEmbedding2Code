@@ -69,12 +69,14 @@ def load_GloVe(args):
 def to_cuda(x):
     return x.cuda() if torch.cuda.is_available() else x
     
+
 def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
     torch.backends.cudnn.deterministic = True
+
 
 def load(args):
 
@@ -117,7 +119,7 @@ def train(args, train_loader, valid_loader):
             train_steps += 1
 
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.001)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.0001) # manage unstable training
             optimizer.step()
             
             print('| training progress [{}/{}]'.format(train_steps, max_train_steps), end='\r', flush=True)
@@ -188,7 +190,6 @@ def evaluate(args, valid_loader, eval_loader, idx2word):
             glove2codes = codes
             glove2bool  = one_hot
     
-    
     glove2codes  = glove2codes.cpu().numpy()
     glove2onehot = glove2bool.cpu().numpy()
 
@@ -214,7 +215,7 @@ def main():
     parser.add_argument('--batch_size',      type=int,   default=128*4,    help='batch size')
     parser.add_argument('--max_epoch',       type=int,   default=200,      help='number of epochs to train')
     parser.add_argument('--lr',              type=float, default=0.0001,   help='learning rate')
-    parser.add_argument('--seed',            type=int,   default=1,        help='random seed')
+    parser.add_argument('--seed',            type=int,   default=55,       help='random seed')
     parser.add_argument('--hidden_dim',      type=int,   default=300,      help='number of dimensions of input size')
     parser.add_argument('--code_book_len',   type=int,   default=32,       help='number of codebooks')
     parser.add_argument('--cluster_num',     type=int,   default=16,       help='length of a codebook')

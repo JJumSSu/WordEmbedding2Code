@@ -72,16 +72,10 @@ class Classifier(nn.Module):
     
         self.lstm = nn.LSTM(input_size = self.emb_size, hidden_size = args.hidden_size, batch_first=True)
         self.fc   = nn.Linear(args.hidden_size, 2)
-
-        self.c0 = torch.zeros(1, 1, args.hidden_size, requires_grad=True)
-        self.h0 = torch.zeros(1, 1, args.hidden_size, requires_grad=True)
-
         
     def forward(self, x):        
-        h = torch.cat([self.h0 for _ in range(x.size(0))], 1).cuda()
-        c = torch.cat([self.c0 for _ in range(x.size(0))], 1).cuda()
         x       = self.embedding(x)
-        out, _  = self.lstm(x, (c,h)) # B H, (c,h)
+        out, _  = self.lstm(x) # B H, (c,h)
         out     = self.fc(out[:, -1, :])
         logits  = F.log_softmax(out, dim=1)
 
