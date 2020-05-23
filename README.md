@@ -48,9 +48,9 @@ make train MODEL_NAME=Your_Compressor_Model_Name M=32 K=16
   
   Normally it should work like as in the figure below.
 
-
-<img align="middle" width="100" height="100" src=[Screenshot](screenshot.PNG)>
-[Screenshot](screenshot.PNG)
+<p align="center">
+  <img width="460" height="300" src=screenshot.PNG>
+</p>
   
 
 ### Evaluate Code Learner
