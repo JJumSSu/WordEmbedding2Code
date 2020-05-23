@@ -20,7 +20,7 @@ Clone.
 git clone https://github.com/JJumSSu/WordEmbedding2Code
 ```
 
-Move to Directory containing source files.
+Move to directory containing source files.
 
 ```
 cd WE_to_Code/src
@@ -34,7 +34,7 @@ bash get_glove.sh
 
 ### Train Code Learner
 
-Specify model output name and glove file.
+Specify the name of the model output.
 
 The glove embedding file will be spliitted into train and valid datasets.
 
@@ -42,17 +42,15 @@ The glove embedding file will be spliitted into train and valid datasets.
 make train MODEL_NAME=Your_Compressor_Model_Name M=32 K=16
 ```
 
-Please note that the loss explodes occasionally even thought the seed is fixed.
-
-When the 'NaN' pops up during training, (or very large number), please re-execute the command.
-
-Normally it should work like as in the figure below:
+* Please note that the loss explodes occasionally even though the seed is fixed.
+  When the 'NaN' pops up during training(or a very large number), please re-execute the command.
+  Normally it should work like as in the figure below.
 
 ![Screenshot](screenshot.PNG)
 
 ### Evaluate Code Learner
 
-Specify model output name(trained) and glove file.
+Specify the name of the trained model(compressing).
 
 Evluation will be conducted on the valid dataset.
 
@@ -62,7 +60,7 @@ make evluate MODEL_NAME=Your_Compressor_Model_Name
 
 ### Run Sentiment Analysis Task
 
-Specify trained glove_model and name of the output model.
+Specify the name of the trained compressing model and name of the classifier.
 
 Evluation will be conducted on the official test dataset(IMDB).
 
@@ -82,7 +80,7 @@ make run_classifier_glove_compressed MODEL_NAME=Output_Model_Name GLOVE_MODEL_NA
 
 ### Reconstruction Loss 
 
-Results evaluated on hedlout validation dataset(42B.300d)
+Results evaluated on the hedlout validation dataset(42B.300d)
 
 |Method|Eculidian|Euclidian^2|
 |------|---|---|
@@ -91,7 +89,7 @@ Results evaluated on hedlout validation dataset(42B.300d)
 
 ### Sentiment Classification Accuracy
 
-Results evaluated on IMDB test dataset
+Results evaluated on the IMDB test dataset
 
 |Method|Accuracy|
 |------|---|
