@@ -16,11 +16,15 @@ Pytorch implementation of the paper
 
 Clone.
 
-```git clone https://github.com/JJumSSu/WordEmbedding2Code```
+```
+git clone https://github.com/JJumSSu/WordEmbedding2Code
+```
 
 Move to Directory containing source files.
 
-```cd WE_to_Code/src```
+```
+cd WE_to_Code/src
+```
 
 ### Get GloVe
 
@@ -34,7 +38,9 @@ Specify model output name and glove file.
 
 The glove embedding file will be spliitted into train and valid datasets.
 
-```make train MODEL_NAME=Your_Compressor_Model_Name M=32 K=16```
+```
+make train MODEL_NAME=Your_Compressor_Model_Name M=32 K=16
+```
 
 Please note that the loss explodes occasionally even thought the seed is fixed.
 
@@ -50,7 +56,9 @@ Specify model output name(trained) and glove file.
 
 Evluation will be conducted on the valid dataset.
 
-```make evluate MODEL_NAME=Your_Compressor_Model_Name```
+```
+make evluate MODEL_NAME=Your_Compressor_Model_Name
+```
 
 ### Run Sentiment Analysis Task
 
@@ -60,11 +68,15 @@ Evluation will be conducted on the official test dataset(IMDB).
 
 Using original GloVe
 
-```make run_classifier_glove MODEL_NAME=Output_Model_Name GLOVE_MODEL_NAME=Your_Compressor_Model_Name```
+```
+make run_classifier_glove MODEL_NAME=Output_Model_Name GLOVE_MODEL_NAME=Your_Compressor_Model_Name
+```
 
 Using compressed GloVe
 
-```make run_classifier_glove_compressed MODEL_NAME=Output_Model_Name GLOVE_MODEL_NAME=Your_Compressor_Model_Name```
+```
+make run_classifier_glove_compressed MODEL_NAME=Output_Model_Name GLOVE_MODEL_NAME=Your_Compressor_Model_Name
+```
 
 ## Result
 
