@@ -44,8 +44,8 @@ make train MODEL_NAME=Your_Compressor_Model_Name M=32 K=16
 
 * Please note that the loss explodes occasionally even though the seed is fixed.
 
-  When the 'NaN' pops up during training(or a very large number), please re-execute the command.
-  
+  When the 'NaN' pops up during training(or a very large number), please __re-execute__ the command.
+    
   Normally it should work like as in the figure below.
 
 <p align="center">
